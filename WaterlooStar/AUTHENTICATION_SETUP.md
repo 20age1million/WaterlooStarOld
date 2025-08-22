@@ -45,12 +45,11 @@ npm start
 
 ## 🔑 How It Works
 
-### Registration Process
+### Registration Process (Email Verification Disabled)
 1. User fills out registration form (username, email, password, confirm password)
 2. Backend validates input and creates user account
-3. Verification email is sent (if SMTP is configured)
-4. User clicks verification link in email
-5. Account is activated and user can login
+3. Account is automatically activated (no email verification required)
+4. User can immediately login with their credentials
 
 ### Login Process
 1. User enters username and password
@@ -69,12 +68,11 @@ npm start
 ## 🎯 User Experience
 
 ### For New Users
-1. Click "📝 Register" in header
+1. Click "📝 Register" in header or user icon
 2. Fill out registration form
-3. Check email for verification link
-4. Click verification link
-5. Return to site and click "🔐 Login"
-6. Enter credentials and start using the forum
+3. Account is automatically created and verified
+4. Automatically switched to login form (or click "🔐 Login")
+5. Enter credentials and start using the forum immediately
 
 ### For Existing Users
 1. Click "🔐 Login" in header

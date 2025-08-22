@@ -56,12 +56,16 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(data.message);
+        setSuccess(data.message + ' Switching to login...');
         // Clear form
         setUsername('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        // Switch to login mode after successful registration (faster since no email verification needed)
+        setTimeout(() => {
+          onSwitchToLogin();
+        }, 1500);
       } else {
         setError(data.message || 'Registration failed');
       }
@@ -91,6 +95,12 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
             <div className="success-message">
               ✅ {success}
             </div>
+          )}
+
+          {!success && (
+            <p style={{ textAlign: 'center', color: '#8b6914', marginBottom: '1.5rem' }}>
+              Join our student community today - no email verification required!
+            </p>
           )}
 
           <div className="form-group">

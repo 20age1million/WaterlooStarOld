@@ -10,6 +10,7 @@ import UserProfile from './components/UserProfile';
 import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import Register from './components/Register';
+import BackendTest from './components/BackendTest';
 import './styles/main.css';
 
 interface UserProfileData {
@@ -191,6 +192,8 @@ const AppContent: React.FC = () => {
                     onClose={() => setShowAuth(false)}
                 />
             )}
+
+            <BackendTest />
         </div>
     );
 };

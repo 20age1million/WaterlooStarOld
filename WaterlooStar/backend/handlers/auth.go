@@ -37,110 +37,149 @@ type AuthResponse struct {
 
 var jwtSecret = []byte("your-secret-key-change-this-in-production")
 
+// Helper function to send JSON error response with logging
+func sendErrorResponse(w http.ResponseWriter, statusCode int, message string, logMessage string) {
+	log.Printf("❌ [%d] %s", statusCode, logMessage)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"message": message})
+}
+
+// Helper function to send JSON success response with logging
+func sendSuccessResponse(w http.ResponseWriter, statusCode int, response interface{}, logMessage string) {
+	log.Printf("✅ [%d] %s", statusCode, logMessage)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(response)
+}
+
 // Register handles user registration
 func Register(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Registration request received from %s", r.RemoteAddr)
+
 	var req RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		sendErrorResponse(w, http.StatusBadRequest, "Invalid request body", fmt.Sprintf("Failed to decode registration request: %v", err))
 		return
 	}
 
+	log.Printf("Registration attempt for username: %s, email: %s", req.Username, req.Email)
+
 	// Validate input
 	if err := validateRegistration(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		sendErrorResponse(w, http.StatusBadRequest, err.Error(), fmt.Sprintf("Registration validation failed for user %s: %v", req.Username, err))
 		return
 	}
 
 	// Check if user already exists
 	var existingUser models.User
 	if err := storage.DB.Where("username = ? OR email = ?", req.Username, req.Email).First(&existingUser).Error; err == nil {
-		http.Error(w, "Username or email already exists", http.StatusConflict)
+		sendErrorResponse(w, http.StatusConflict, "Username or email already exists", fmt.Sprintf("Registration failed - user already exists: username=%s, email=%s", req.Username, req.Email))
 		return
 	}
 
 	// Create new user
 	user := models.User{
-		Username: req.Username,
-		Email:    req.Email,
+		Username:        req.Username,
+		Email:           req.Email,
+		IsEmailVerified: true, // Auto-verify for now (email verification disabled)
 	}
 
 	// Hash password
 	if err := user.HashPassword(req.Password); err != nil {
-		http.Error(w, "Failed to process password", http.StatusInternalServerError)
+		sendErrorResponse(w, http.StatusInternalServerError, "Failed to process password", fmt.Sprintf("Password hashing failed for user %s: %v", req.Username, err))
 		return
 	}
 
-	// Generate email verification token
-	token, err := generateRandomToken()
-	if err != nil {
-		http.Error(w, "Failed to generate verification token", http.StatusInternalServerError)
-		return
-	}
-	user.EmailVerifyToken = token
+	// Skip email verification token generation since we're auto-verifying
+	// token, err := generateRandomToken()
+	// if err != nil {
+	// 	http.Error(w, "Failed to generate verification token", http.StatusInternalServerError)
+	// 	return
+	// }
+	// user.EmailVerifyToken = token
 
 	// Save user to database
 	if err := storage.DB.Create(&user).Error; err != nil {
-		log.Printf("Failed to create user: %v", err)
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		sendErrorResponse(w, http.StatusInternalServerError, "Failed to create user", fmt.Sprintf("Database error creating user %s: %v", req.Username, err))
 		return
 	}
 
-	// Send verification email
-	if err := sendVerificationEmail(user.Email, user.Username, token); err != nil {
-		log.Printf("Failed to send verification email: %v", err)
-		// Don't fail the registration, just log the error
-	}
+	log.Printf("User created successfully: ID=%d, Username=%s", user.ID, user.Username)
+
+	// Skip sending verification email since we're auto-verifying
+	// if err := sendVerificationEmail(user.Email, user.Username, token); err != nil {
+	// 	log.Printf("Failed to send verification email: %v", err)
+	// 	// Don't fail the registration, just log the error
+	// }
 
 	response := AuthResponse{
-		Message: "Registration successful! Please check your email to verify your account.",
+		Message: "Registration successful! You can now log in with your credentials.",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	sendSuccessResponse(w, http.StatusCreated, response, fmt.Sprintf("User %s (ID: %d) registered successfully", user.Username, user.ID))
 }
 
 // Login handles user authentication
 func Login(w http.ResponseWriter, r *http.Request) {
+	log.Printf("🔐 Login request received from %s", r.RemoteAddr)
+
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		sendErrorResponse(w, http.StatusBadRequest, "Invalid request body", fmt.Sprintf("Failed to decode login request: %v", err))
 		return
 	}
+
+	log.Printf("🔐 Login attempt for username: %s", req.Username)
 
 	// Find user by username
 	var user models.User
 	if err := storage.DB.Where("username = ?", req.Username).First(&user).Error; err != nil {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		sendErrorResponse(w, http.StatusUnauthorized, "Invalid username or password", fmt.Sprintf("Login failed - user not found: %s", req.Username))
 		return
 	}
 
-	// Check if email is verified
-	if !user.IsEmailVerified {
-		http.Error(w, "Please verify your email before logging in", http.StatusUnauthorized)
-		return
-	}
+	// Skip email verification check (disabled for now)
+	// if !user.IsEmailVerified {
+	// 	http.Error(w, "Please verify your email before logging in", http.StatusUnauthorized)
+	// 	return
+	// }
 
 	// Check password
 	if !user.CheckPassword(req.Password) {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		sendErrorResponse(w, http.StatusUnauthorized, "Invalid username or password", fmt.Sprintf("Login failed - invalid password for user: %s", req.Username))
 		return
 	}
 
 	// Generate JWT token
 	token, err := generateJWTToken(user.ID, user.Username)
 	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		sendErrorResponse(w, http.StatusInternalServerError, "Failed to generate token", fmt.Sprintf("JWT generation failed for user %s: %v", req.Username, err))
 		return
+	}
+
+	// Create a clean user object without relationships to avoid JSON serialization issues
+	cleanUser := models.User{
+		ID:              user.ID,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
+		Username:        user.Username,
+		Email:           user.Email,
+		IsEmailVerified: user.IsEmailVerified,
+		Name:            user.Name,
+		SchoolYear:      user.SchoolYear,
+		Major:           user.Major,
+		ContactInfo:     user.ContactInfo,
+		Bio:             user.Bio,
 	}
 
 	response := AuthResponse{
 		Message: "Login successful",
-		User:    &user,
+		User:    &cleanUser,
 		Token:   token,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	sendSuccessResponse(w, http.StatusOK, response, fmt.Sprintf("User %s (ID: %d) logged in successfully", user.Username, user.ID))
 }
 
 // VerifyEmail handles email verification

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Registration</title>
+</head>
+<body>
+    <h1>Registration Debug Test</h1>
+    <form id="testForm">
+        <div>
+            <label>Username:</label>
+            <input type="text" id="username" value="testuser" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" value="test@example.com" required>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="password" value="password123" required>
+        </div>
+        <div>
+            <label>Confirm Password:</label>
+            <input type="password" id="confirmPassword" value="password123" required>
+        </div>
+        <button type="submit">Test Register</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Sending request to: http://localhost:8080/api/auth/register');
+                console.log('Data:', { username, email, password, confirm_password: confirmPassword });
+                
+                const response = await fetch('http://localhost:8080/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        confirm_password: confirmPassword,
+                    }),
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div style="color: green;">SUCCESS: ${data.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">ERROR: ${data.message || 'Registration failed'}</div>`;
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                resultDiv.innerHTML = `<div style="color: red;">NETWORK ERROR: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

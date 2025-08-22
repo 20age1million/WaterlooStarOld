@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Connectivity Test</title>
+</head>
+<body>
+    <h1>Backend Connectivity Test</h1>
+    <button onclick="testConnection()">Test Backend Connection</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing connection...';
+            
+            try {
+                // Test 1: Basic connectivity
+                console.log('Testing basic connectivity...');
+                const response = await fetch('http://localhost:8080/api/posts', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <h3>✅ Backend is accessible!</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Posts found: ${data.length}</p>
+                            <p>CORS headers present: ${response.headers.get('Access-Control-Allow-Origin') ? 'Yes' : 'No'}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: orange;">
+                            <h3>⚠️ Backend responded but with error</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Status Text: ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <h3>❌ Cannot connect to backend</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure the backend server is running on port 8080</p>
+                        <p>Run: <code>cd WaterlooStar/backend && go run main.go</code></p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

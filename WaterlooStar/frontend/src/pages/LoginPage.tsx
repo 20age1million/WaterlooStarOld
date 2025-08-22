@@ -100,17 +100,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAuthenticated }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(data.message);
+        setSuccess(data.message + ' Switching to login...');
         // Clear form
         setUsername('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
-        // Switch to login mode after successful registration
+        // Switch to login mode after successful registration (faster since no email verification needed)
         setTimeout(() => {
           setMode('login');
           setSuccess('');
-        }, 3000);
+        }, 1500);
       } else {
         setError(data.message || 'Registration failed');
       }
@@ -209,7 +209,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAuthenticated }) => {
           ) : (
             <form onSubmit={handleRegister} className="auth-form">
               <h2>Create Account</h2>
-              <p>Join our student community today</p>
+              <p>Join our student community today - no email verification required!</p>
 
               <div className="form-group">
                 <label htmlFor="username">Username *</label>
