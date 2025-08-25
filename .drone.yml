@@ -1,49 +1,9 @@
 kind: pipeline
 type: docker
-name: react-go-ci
+name: sanity
 
 steps:
-  # --- sanity: show tree so you can confirm paths in logs ---
-  - name: show-layout
+  - name: hello
     image: alpine:3.20
     commands:
-      - echo "PWD: $(pwd)"
-      - ls -la
-      - ls -la WaterlooStar
-      - ls -la WaterlooStar/frontend || true
-      - ls -la WaterlooStar/backend || true
-
-  # --- Frontend (React) ---
-  - name: frontend-install
-    image: node:20
-    commands:
-      - cd WaterlooStar/frontend
-      - npm ci
-  - name: frontend-build
-    image: node:20
-    commands:
-      - cd WaterlooStar/frontend
-      - npm run build
-
-  # --- Backend (Go) ---
-  - name: backend-test
-    image: golang:1.22
-    environment:
-      CGO_ENABLED: 0
-    commands:
-      - cd WaterlooStar/backend
-      - go test ./...
-  - name: backend-build
-    image: golang:1.22
-    environment:
-      CGO_ENABLED: 0
-    commands:
-      - cd WaterlooStar/backend
-      - go build -o server ./...
-
-trigger:
-  event:
-    - push
-    - pull_request
-  branch:
-    - main
+      - echo "Drone is connected"
