@@ -14,11 +14,11 @@ const CreatePost: React.FC = () => {
 
   const getSectionTitle = (sectionName?: string) => {
     const titles: { [key: string]: string } = {
-      'housing': '🏠 Student Housing',
-      'deals': '💰 Deals & Discounts',
-      'news': '📰 Campus News',
-      'events': '🎉 Events & Activities',
-      'help': '❓ Q&A / Help Desk'
+      'housing': 'Student Housing',
+      'deals': 'Deals & Discounts',
+      'news': 'Campus News',
+      'events': 'Events & Activities',
+      'help': 'Q&A / Help Desk'
     };
     return titles[sectionName || ''] || `${sectionName?.charAt(0).toUpperCase()}${sectionName?.slice(1)} Board`;
   };
@@ -72,7 +72,7 @@ const CreatePost: React.FC = () => {
   return (
     <div className="create-post-page">
       <div className="create-post-header">
-        <h1>✍️ Create New Post</h1>
+        <h1>Create New Post</h1>
         <p>Share something with the <strong>{getSectionTitle(section)}</strong> community</p>
       </div>
       
@@ -133,7 +133,7 @@ const CreatePost: React.FC = () => {
             className="submit-btn"
             disabled={loading || !title.trim() || !content.trim()}
           >
-            {loading ? 'Posting...' : '📝 Share Post'}
+            {loading ? 'Posting...' : 'Share Post'}
           </button>
         </div>
       </form>

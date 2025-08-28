@@ -53,11 +53,11 @@ const SectionBoard: React.FC<SectionBoardProps> = ({ isAuthenticated = false }) 
 
   const getSectionTitle = (sectionName?: string) => {
     const titles: { [key: string]: string } = {
-      'housing': '🏠 Student Housing',
-      'deals': '💰 Deals & Discounts',
-      'news': '📰 Campus News',
-      'events': '🎉 Events & Activities',
-      'help': '❓ Q&A / Help Desk'
+      'housing': 'Student Housing',
+      'deals': 'Deals & Discounts',
+      'news': 'Campus News',
+      'events': 'Events & Activities',
+      'help': 'Q&A / Help Desk'
     };
     return titles[sectionName || ''] || `${sectionName?.charAt(0).toUpperCase()}${sectionName?.slice(1)} Board`;
   };

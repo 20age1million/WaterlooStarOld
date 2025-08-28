@@ -145,13 +145,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAuthenticated }) => {
               className={`tab-btn ${mode === 'login' ? 'active' : ''}`}
               onClick={() => switchMode('login')}
             >
-              🔐 Login
+              Login
             </button>
             <button 
               className={`tab-btn ${mode === 'register' ? 'active' : ''}`}
               onClick={() => switchMode('register')}
             >
-              📝 Register
+              Register
             </button>
           </div>
 
@@ -203,7 +203,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAuthenticated }) => {
                 className="submit-btn"
                 disabled={loading || !username.trim() || !password.trim()}
               >
-                {loading ? 'Signing In...' : '🚀 Sign In'}
+                {loading ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           ) : (
@@ -271,7 +271,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAuthenticated }) => {
                 className="submit-btn"
                 disabled={loading || !username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()}
               >
-                {loading ? 'Creating Account...' : '🎉 Create Account'}
+                {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
           )}

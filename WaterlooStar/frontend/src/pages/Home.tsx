@@ -38,11 +38,11 @@ const Home: React.FC = () => {
 
             <div className="recent-posts-section">
                 <h2 className="recent-posts-title">
-                    🔥 Recent Community Posts
+                    Recent Community Posts
                 </h2>
                 {loading ? (
                     <div style={{ textAlign: 'center', color: '#718096', margin: '2rem 0' }}>
-                        Loading recent posts... 📚
+                        Loading recent posts...
                     </div>
                 ) : (
                     <>
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
                                 borderRadius: '12px',
                                 border: '2px dashed #e2e8f0'
                             }}>
-                                <h3>🌟 Be the first to post!</h3>
+                                <h3>Be the first to post!</h3>
                                 <p>Start the conversation by sharing something in one of our community sections above.</p>
                             </div>
                         )}
