@@ -21,9 +21,9 @@ steps:
         - latest
         - ${DRONE_COMMIT_SHA}
       username:
-        from_secret: GHCR_USERNAME
+        from_secret: 20age1million-wxyz
       password:
-        from_secret: GHCR_TOKEN
+        from_secret: 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
       dockerfile: Dockerfile
       context: .
       # If you want BuildKit buildx/multi-arch later, swap to plugins/buildx.
@@ -33,9 +33,9 @@ steps:
     image: docker:27-cli
     environment:
       GHCR_USERNAME:
-        from_secret: GHCR_USERNAME
+        from_secret: 20age1million-wxyz
       GHCR_TOKEN:
-        from_secret: GHCR_TOKEN
+        from_secret: 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
       IMAGE: ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}:latest
     volumes:
       - name: docker_sock
