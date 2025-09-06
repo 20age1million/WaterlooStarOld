@@ -12,7 +12,6 @@ steps:
     image: plugins/docker
     settings:
       registry: ghcr.io
-      # use a distinct repo name for the frontend image
       repo: ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}-frontend
       tags: [ latest, ${DRONE_COMMIT_SHA} ]
       username:
