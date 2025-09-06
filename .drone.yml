@@ -10,6 +10,13 @@ trigger:
     - main
 
 steps:
+ - name: debug-tree
+   image: alpine:3.20
+   commands:
+     - pwd
+     - ls -la
+     - find . -maxdepth 3 -type d -print
+    
   - name: build-push-ghcr
     image: plugins/docker
     settings:
