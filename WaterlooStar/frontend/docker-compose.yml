@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  waterloo-star-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: waterloo-star-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - waterloo-star-network
+
+networks:
+  waterloo-star-network:
+    driver: bridge
