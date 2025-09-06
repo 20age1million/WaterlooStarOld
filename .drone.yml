@@ -4,22 +4,26 @@ type: docker
 name: build_and_deploy
 
 trigger:
-  event: [ push ]
-  branch: [ main ]
+  event:
+    - push
+  branch:
+    - main
 
 steps:
   - name: build-push-ghcr
     image: plugins/docker
     settings:
       registry: ghcr.io
-      repo: ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}-frontend
-      tags: [ latest, ${DRONE_COMMIT_SHA} ]
+      repo: "ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}-frontend"
+      tags:
+        - latest
+        - "${DRONE_COMMIT_SHA}"
       username:
         from_secret: GHCR_USERNAME
       password:
         from_secret: GHCR_TOKEN
-      dockerfile: frontend/Dockerfile   # <-- your Dockerfile path
-      context: frontend                 # <-- build context folder
+      dockerfile: frontend/Dockerfile
+      context: frontend
 
   - name: deploy
     image: docker:27-cli
@@ -28,7 +32,7 @@ steps:
         from_secret: GHCR_USERNAME
       GHCR_TOKEN:
         from_secret: GHCR_TOKEN
-      IMAGE: ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}-frontend:latest
+      IMAGE: "ghcr.io/${DRONE_REPO_OWNER,,}/${DRONE_REPO_NAME,,}-frontend:latest"
     volumes:
       - name: docker_sock
         path: /var/run/docker.sock
