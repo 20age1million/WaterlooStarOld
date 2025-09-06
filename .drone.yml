@@ -29,8 +29,8 @@ steps:
         from_secret: GHCR_USERNAME
       password:
         from_secret: GHCR_TOKEN
-      dockerfile: frontend/Dockerfile
-      context: frontend
+      dockerfile: WaterlooStar/frontend/Dockerfile   # <— fixed
+      context: WaterlooStar/frontend                 # <— fixed
 
   - name: deploy
     image: docker:27-cli
