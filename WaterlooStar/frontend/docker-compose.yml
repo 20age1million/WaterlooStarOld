@@ -1,19 +1,7 @@
-version: '3.8'
-
 services:
-  waterloo-star-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  web:
+    image: ghcr.io/20age1million/waterloostar-frontend:latest
+    container_name: waterloostar-frontend
     ports:
-      - "3000:80"
-    container_name: waterloo-star-frontend
+      - "3000:80"          # nginx in image serves on 80; expose as localhost:3000
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-    networks:
-      - waterloo-star-network
-
-networks:
-  waterloo-star-network:
-    driver: bridge
