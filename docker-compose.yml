@@ -1,7 +1,0 @@
-services:
-  web:
-    image: ghcr.io/20age1million/waterloostar-frontend:latest
-    container_name: waterloostar-frontend
-    ports:
-      - "3000:80"          # nginx in image serves on 80; expose as localhost:3000
-    restart: unless-stopped

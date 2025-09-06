@@ -29,8 +29,8 @@ steps:
         from_secret: GHCR_USERNAME
       password:
         from_secret: GHCR_TOKEN
-      dockerfile: WaterlooStar/frontend/Dockerfile   # <— fixed
-      context: WaterlooStar/frontend                 # <— fixed
+      dockerfile: WaterlooStar/frontend/Dockerfile # <— fixed
+      context: WaterlooStar/frontend # <— fixed
 
   - name: deploy
     image: docker:27-cli
@@ -46,8 +46,8 @@ steps:
     commands:
       - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
       - docker pull "$IMAGE"
-      - docker compose -f frontend/docker-compose.yml pull
-      - docker compose -f frontend/docker-compose.yml up -d
+      - docker compose -f WaterlooStar/frontend/docker-compose.yml pull
+      - docker compose -f WaterlooStar/frontend/docker-compose.yml up -d
 
 volumes:
   - name: docker_sock
