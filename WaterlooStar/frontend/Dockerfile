@@ -1,33 +1,25 @@
-# Multi-stage build for React TypeScript application
-# Stage 1: Build the application
-FROM node:18-alpine AS build
+# syntax=docker/dockerfile:1
 
-# Set working directory
+# ---- Build stage ------------------------------------------------------------
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Copy package files
+# 1) Install ALL deps (incl. dev) so TS/types & tools exist
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm ci --only=production
-
-# Copy source code
+# 2) Copy source and build
 COPY . .
-
-# Build the application
+# Avoid CRA prompts + enable CI mode
+ENV CI=true
 RUN npm run build
 
-# Stage 2: Serve the application with nginx
+# ---- Runtime stage (nginx) --------------------------------------------------
 FROM nginx:alpine AS production
+# If you don't actually have nginx.conf in the repo, remove the next line or add the file.
+# COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy built application from build stage
+# CRA outputs to /app/build (Vite uses /app/dist — adjust if needed)
 COPY --from=build /app/build /usr/share/nginx/html
-
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 80
 EXPOSE 80
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
