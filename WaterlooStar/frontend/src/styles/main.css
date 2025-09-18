@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #f4e4bc 0%, #e8d5a3 50%, #dcc48a 100%);
   margin: 0;
   padding: 0;
@@ -227,13 +227,18 @@ footer {
 }
 
 .section-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 
@@ -418,7 +423,8 @@ form {
   border: 1px solid #e2e8f0;
 }
 
-form input, form textarea {
+form input,
+form textarea {
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.75rem;
@@ -429,7 +435,8 @@ form input, form textarea {
   transition: border-color 0.3s ease;
 }
 
-form input:focus, form textarea:focus {
+form input:focus,
+form textarea:focus {
   outline: none;
   border-color: #d4a574;
   box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.2);
@@ -1540,7 +1547,8 @@ form button:disabled {
     padding: 1rem;
   }
 
-  form input, form textarea {
+  form input,
+  form textarea {
     padding: 0.75rem;
     font-size: 16px; /* Prevents zoom on iOS */
   }
@@ -2021,4 +2029,14 @@ form button:disabled {
     height: 40px;
     font-size: 1.1rem;
   }
+}
+
+/* just a tiny rule for reusable hook at src/Reusable_hook/useDraggable*/
+.general-chat .chat-header {
+  cursor: move;
+  user-select: none;
+}
+.backend-test .panel-handle {
+  cursor: move;
+  user-select: none;
 }
