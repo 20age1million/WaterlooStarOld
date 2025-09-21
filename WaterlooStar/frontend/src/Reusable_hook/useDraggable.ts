@@ -1,26 +1,34 @@
 import { useEffect } from "react";
 
-export function useDraggable(
-  ref: React.RefObject<HTMLElement>,
+export function useDraggable<T extends HTMLElement>(
+  ref:
+    | React.RefObject<HTMLElement | null>
+    | React.MutableRefObject<HTMLElement | null>,
   handleSelector?: string,
   storageKey?: string
 ) {
   useEffect(() => {
-    const el = ref.current;
+    const el = ref.current as HTMLElement | null;
     if (!el) return;
 
     const handle = handleSelector
       ? el.querySelector<HTMLElement>(handleSelector)
       : el;
     if (!handle) return;
+    const h = handle; // freeze non-null for the closures below
 
-    // Ensure we move via left/top
+    // positioning & perf hints
     el.style.position = "fixed";
     if (!el.style.left) el.style.left = "24px";
     if (!el.style.top) el.style.top = "24px";
     el.style.willChange = "left, top";
 
-    // Restore saved position
+    // make dragging feel right
+    h.style.cursor = "move";
+    h.style.userSelect = "none";
+    (h.style as any).touchAction = "none";
+
+    // restore saved position
     if (storageKey) {
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
@@ -29,8 +37,8 @@ export function useDraggable(
           Number.isFinite(saved.left) &&
           Number.isFinite(saved.top)
         ) {
-          el.style.left = saved.left + "px";
-          el.style.top = saved.top + "px";
+          el.style.left = `${saved.left}px`;
+          el.style.top = `${saved.top}px`;
         }
       } catch {}
     }
@@ -44,7 +52,7 @@ export function useDraggable(
       startTop = 0;
 
     function onPointerDown(e: PointerEvent) {
-      handle.setPointerCapture?.(e.pointerId);
+      h.setPointerCapture?.(e.pointerId);
 
       const rect = el.getBoundingClientRect();
       startLeft = rect.left;
@@ -55,27 +63,20 @@ export function useDraggable(
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("pointerup", onPointerUp);
       window.addEventListener("pointercancel", onPointerUp);
-      // In some UAs, losing capture won’t fire pointerup; this helps cleanup:
-      handle.addEventListener("lostpointercapture", onPointerUp, {
-        once: true,
-      });
+      h.addEventListener("lostpointercapture", onPointerUp, { once: true });
     }
 
     function onPointerMove(e: PointerEvent) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-
-      const w = el.offsetWidth,
-        h = el.offsetHeight;
-      const maxL = window.innerWidth - w;
-      const maxT = window.innerHeight - h;
-
-      el.style.left = clamp(startLeft + dx, 0, Math.max(0, maxL)) + "px";
-      el.style.top = clamp(startTop + dy, 0, Math.max(0, maxT)) + "px";
+      const maxL = Math.max(0, window.innerWidth - el.offsetWidth);
+      const maxT = Math.max(0, window.innerHeight - el.offsetHeight);
+      el.style.left = clamp(startLeft + dx, 0, maxL) + "px";
+      el.style.top = clamp(startTop + dy, 0, maxT) + "px";
     }
 
     function onPointerUp(e: PointerEvent) {
-      handle.releasePointerCapture?.(e.pointerId);
+      h.releasePointerCapture?.(e.pointerId);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
@@ -91,23 +92,16 @@ export function useDraggable(
       }
     }
 
-    // Save previous inline styles so we can restore them
-    const prevCursor = handle.style.cursor;
-    const prevUserSelect = handle.style.userSelect;
+    h.addEventListener("pointerdown", onPointerDown);
 
-    handle.style.cursor = "move";
-    handle.style.userSelect = "none";
-    handle.addEventListener("pointerdown", onPointerDown);
-
-    // Cleanup — covers unmounts and effect re-runs during a drag
     return () => {
-      handle.removeEventListener("pointerdown", onPointerDown);
+      h.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       try {
-        handle.style.cursor = prevCursor;
-        handle.style.userSelect = prevUserSelect;
+        h.style.cursor = "";
+        h.style.userSelect = "";
       } catch {}
     };
   }, [ref, handleSelector, storageKey]);

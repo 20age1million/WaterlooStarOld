@@ -34,7 +34,7 @@ const GeneralChat: React.FC = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
   useDraggable(panelRef, ".chat-header", "pos:general-chat");
 
