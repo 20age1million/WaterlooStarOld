@@ -1,2 +1,2 @@
 # WaterlooStar
-Demo Website for project WaterlooStar
+Demo Website for project WaterlooStar.com
